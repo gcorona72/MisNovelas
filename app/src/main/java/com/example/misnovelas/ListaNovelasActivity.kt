@@ -1,6 +1,8 @@
 package com.example.misnovelas
 
 import android.content.Context
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -15,25 +17,21 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.misnovelas.ui.theme.misnovelasTheme
-import android.content.Intent
-import android.content.SharedPreferences
 
 class ListaNovelasActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             misnovelasTheme {
-                val dbHelper = UserDatabaseHelper(this)
-                val sharedPreferences = getSharedPreferences("settings", MODE_PRIVATE)
-                val currentUser = sharedPreferences.getString("current_user", "") ?: ""
-                ListaNovelasScreen(dbHelper = dbHelper, currentUser = currentUser)
+                val dbHelper = NovelaStorage(this)
+                ListaNovelasScreen(dbHelper = dbHelper)
             }
         }
     }
 }
 
 @Composable
-fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelper, currentUser: String) {
+fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: NovelaStorage) {
     var showDialog by remember { mutableStateOf(false) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var showErrorDialog by remember { mutableStateOf(false) }
@@ -42,6 +40,8 @@ fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelp
     var año by remember { mutableStateOf("") }
     var descripcion by remember { mutableStateOf("") }
     var valoracion by remember { mutableStateOf("") }
+    var latitud by remember { mutableStateOf("") }
+    var longitud by remember { mutableStateOf("") }
     var novelas by remember { mutableStateOf(listOf<Novela>()) }
     var nombreABorrar by remember { mutableStateOf("") }
     var mensajeError by remember { mutableStateOf("") }
@@ -49,11 +49,9 @@ fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelp
     var novelaSeleccionada by remember { mutableStateOf<Novela?>(null) }
 
     val context = LocalContext.current
-    val novelaStorage = NovelaStorage(context)
-    val userId = dbHelper.getUserIdByUsername(currentUser)
 
     LaunchedEffect(Unit) {
-        novelas = dbHelper.getNovelasByUser(userId)
+        novelas = dbHelper.getNovelas()
     }
 
     Column(
@@ -87,9 +85,9 @@ fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelp
         val recyclerView = remember { RecyclerView(context) }
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = NovelaAdapter(context, novelasAMostrar, { novela ->
-            val success = novelaStorage.updateFavoriteStatus(novela)
+            val success = dbHelper.updateFavoriteStatus(novela)
             if (success) {
-                novelas = novelas.map { if (it.nombre == novela.nombre) novela else it }
+                novelas = dbHelper.getNovelas()
             } else {
                 mensajeError = "Error al actualizar el estado de favorito en SQLite"
                 showErrorDialog = true
@@ -127,12 +125,22 @@ fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelp
                             onValueChange = { valoracion = it },
                             label = { Text("Valoración") }
                         )
+                        TextField(
+                            value = latitud,
+                            onValueChange = { latitud = it },
+                            label = { Text("Latitud") }
+                        )
+                        TextField(
+                            value = longitud,
+                            onValueChange = { longitud = it },
+                            label = { Text("Longitud") }
+                        )
                     }
                 },
                 confirmButton = {
                     Button(onClick = {
                         when {
-                            nombre.isBlank() || año.isBlank() || descripcion.isBlank() || valoracion.isBlank() -> {
+                            nombre.isBlank() || año.isBlank() || descripcion.isBlank() || valoracion.isBlank() || latitud.isBlank() || longitud.isBlank() -> {
                                 mensajeError = "Todos los campos deben estar completos"
                                 showErrorDialog = true
                             }
@@ -150,15 +158,18 @@ fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelp
                                     año = año.toInt(),
                                     descripcion = descripcion,
                                     valoracion = valoracion.toDouble(),
-                                    isFavorite = false
+                                    isFavorite = false,
+                                    latitud = latitud.toDouble(),
+                                    longitud = longitud.toDouble()
                                 )
-                                dbHelper.addNovelaForUser(userId, nuevaNovela)
-                                novelaStorage.saveNovela(nuevaNovela)
-                                novelas = dbHelper.getNovelasByUser(userId)
+                                dbHelper.saveNovela(nuevaNovela)
+                                novelas = dbHelper.getNovelas()
                                 nombre = ""
                                 año = ""
                                 descripcion = ""
                                 valoracion = ""
+                                latitud = ""
+                                longitud = ""
                                 showDialog = false
                             }
                         }
@@ -191,10 +202,9 @@ fun ListaNovelasScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelp
                     Button(onClick = {
                         val novelaAEliminar = novelas.find { it.nombre == nombreABorrar }
                         if (novelaAEliminar != null) {
-                            val success = novelaStorage.deleteNovela(novelaAEliminar.nombre)
+                            val success = dbHelper.deleteNovela(novelaAEliminar.nombre)
                             if (success) {
-                                dbHelper.deleteNovelaForUser(userId, novelaAEliminar.nombre)
-                                novelas = dbHelper.getNovelasByUser(userId)
+                                novelas = dbHelper.getNovelas()
                                 mensajeError = ""
                             } else {
                                 mensajeError = "Error al eliminar la novela de SQLite"

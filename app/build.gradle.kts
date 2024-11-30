@@ -3,15 +3,15 @@ import org.gradle.kotlin.dsl.test
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.compose) // Add this line
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
-    namespace = "com.example.definitivofeedback"
+    namespace = "com.example.misnovelas"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.definitivofeedback"
+        applicationId = "com.example.misnovelas"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -62,8 +62,20 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.recyclerview)
     implementation("androidx.work:work-runtime-ktx:2.8.1")
-    implementation ("androidx.navigation:navigation-compose:2.7.3")
-    implementation ("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.navigation:navigation-compose:2.7.3")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation("androidx.activity:activity-compose:1.7.2")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation ("com.google.android.gms:play-services-maps:18.1.0")
+    dependencies {
+        implementation("com.google.android.gms:play-services-maps:18.1.0")
+        implementation("androidx.appcompat:appcompat:1.6.1")
+    }
+    dependencies {
+        implementation ("com.google.android.gms:play-services-location:18.0.0")
+    }
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))

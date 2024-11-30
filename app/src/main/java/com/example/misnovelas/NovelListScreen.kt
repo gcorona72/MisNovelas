@@ -1,6 +1,5 @@
 package com.example.misnovelas
 
-import android.content.SharedPreferences
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -8,18 +7,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.misnovelas.Novela
-import com.example.misnovelas.UserDatabaseHelper
+import androidx.navigation.NavHostController
 
 @Composable
-fun NovelListScreen(navController: NavController, dbHelper: UserDatabaseHelper, sharedPreferences: SharedPreferences) {
+fun NovelListScreen(navController: NavHostController, dbHelper: NovelaStorage) {
     var novelas by remember { mutableStateOf(listOf<Novela>()) }
 
     // Cargar datos de la base de datos
     LaunchedEffect(Unit) {
-        val userId = dbHelper.getCurrentUserId(sharedPreferences) // Método que asume usuario actual
-        novelas = dbHelper.getNovelasByUser(userId)
+        novelas = dbHelper.getNovelas()
     }
 
     Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {

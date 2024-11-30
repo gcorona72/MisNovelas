@@ -1,70 +1,43 @@
 package com.example.misnovelas
 
-import android.content.SharedPreferences
+import android.content.Intent
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.example.misnovelas.Novela
-import com.example.misnovelas.UserDatabaseHelper
 
 @Composable
-fun AddNovelScreen(navController: NavController, dbHelper: UserDatabaseHelper, sharedPreferences: SharedPreferences) {
+fun AddNovelaScreen(dbHelper: NovelaStorage) {
     var nombre by remember { mutableStateOf("") }
-    var año by remember { mutableStateOf("") }
+    var año by remember { mutableStateOf(0) }
     var descripcion by remember { mutableStateOf("") }
-    var errorMessage by remember { mutableStateOf("") }
+    var valoracion by remember { mutableStateOf(0.0) }
+    var isFavorite by remember { mutableStateOf(false) }
+    var latitud by remember { mutableStateOf(0.0) }
+    var longitud by remember { mutableStateOf(0.0) }
 
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text("Añadir Novela")
+        TextField(value = nombre, onValueChange = { nombre = it }, label = { Text("Nombre") })
+        TextField(value = año.toString(), onValueChange = { año = it.toIntOrNull() ?: 0 }, label = { Text("Año") })
+        TextField(value = descripcion, onValueChange = { descripcion = it }, label = { Text("Descripción") })
+        TextField(value = valoracion.toString(), onValueChange = { valoracion = it.toDoubleOrNull() ?: 0.0 }, label = { Text("Valoración") })
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center
-    ) {
-        TextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre de la novela") }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = año,
-            onValueChange = { año = it },
-            label = { Text("Año") }
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = descripcion,
-            onValueChange = { descripcion = it },
-            label = { Text("Descripción") }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        // Agregar campos para latitud y longitud
+        TextField(value = latitud.toString(), onValueChange = { latitud = it.toDoubleOrNull() ?: 0.0 }, label = { Text("Latitud") })
+        TextField(value = longitud.toString(), onValueChange = { longitud = it.toDoubleOrNull() ?: 0.0 }, label = { Text("Longitud") })
+
         Button(onClick = {
-            if (nombre.isNotBlank() && año.isNotBlank() && descripcion.isNotBlank() && año.all { it.isDigit() }) {
-                val userId = dbHelper.getCurrentUserId(sharedPreferences)
-                dbHelper.addNovelaForUser(
-                    userId,
-                    Novela(
-                        nombre = nombre,
-                        año = año.toInt(),
-                        descripcion = descripcion,
-                        valoracion = 0.0,
-                        isFavorite = false
-                    )
-                )
-                navController.navigate("novelList")
-            } else {
-                errorMessage = "Por favor, completa todos los campos correctamente."
-            }
+            val novela = Novela(nombre, año, descripcion, valoracion, isFavorite, latitud, longitud)
+            dbHelper.saveNovela(novela)
         }) {
-            Text("Añadir Novela")
-        }
-        if (errorMessage.isNotBlank()) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(errorMessage, color = MaterialTheme.colorScheme.error)
+            Text("Guardar Novela")
         }
     }
+
+
 }

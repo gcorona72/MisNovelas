@@ -32,7 +32,7 @@ class MainActivity : ComponentActivity() {
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE)
         setContent {
             misnovelasTheme {
-                val dbHelper = UserDatabaseHelper(this)
+                val dbHelper = NovelaStorage(this)
                 MainScreen(dbHelper = dbHelper, sharedPreferences = sharedPreferences)
             }
         }
@@ -40,15 +40,15 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainScreen(dbHelper: UserDatabaseHelper, sharedPreferences: SharedPreferences) {
+fun MainScreen(dbHelper: NovelaStorage, sharedPreferences: SharedPreferences) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
         startDestination = "main"
     ) {
         composable("main") { MainMenu(navController) }
-        composable("novelList") { NovelListScreen(navController, dbHelper, sharedPreferences) }
-        composable("addNovel") { AddNovelScreen(navController, dbHelper, sharedPreferences) }
+        composable("novelList") { NovelListScreen(navController, dbHelper) }
+        composable("addNovel") { AddNovelaScreen(dbHelper) }
     }
 }
 

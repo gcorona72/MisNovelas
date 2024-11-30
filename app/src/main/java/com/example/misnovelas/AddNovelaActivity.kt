@@ -1,6 +1,5 @@
 package com.example.misnovelas
 
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -18,12 +17,12 @@ import androidx.compose.ui.unit.dp
 import com.example.misnovelas.ui.theme.misnovelasTheme
 
 class AddNovelaActivity : ComponentActivity() {
-    private lateinit var dbHelper: UserDatabaseHelper
+    private lateinit var dbHelper: NovelaStorage
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        dbHelper = UserDatabaseHelper(this)
+        dbHelper = NovelaStorage(this)
         sharedPreferences = getSharedPreferences("settings", Context.MODE_PRIVATE)
 
         setContent {
@@ -36,11 +35,13 @@ class AddNovelaActivity : ComponentActivity() {
     }
 
     @Composable
-    fun AddNovelaScreen(modifier: Modifier = Modifier, dbHelper: UserDatabaseHelper) {
+    fun AddNovelaScreen(modifier: Modifier = Modifier, dbHelper: NovelaStorage) {
         var nombre by remember { mutableStateOf("") }
         var año by remember { mutableStateOf("") }
         var descripcion by remember { mutableStateOf("") }
         var valoracion by remember { mutableStateOf("") }
+        var latitud by remember { mutableStateOf("") }
+        var longitud by remember { mutableStateOf("") }
         val context = LocalContext.current
 
         Column(
@@ -74,16 +75,30 @@ class AddNovelaActivity : ComponentActivity() {
                 label = { Text("Valoración") }
             )
             Spacer(modifier = Modifier.height(16.dp))
+            TextField(
+                value = latitud,
+                onValueChange = { latitud = it },
+                label = { Text("Latitud") }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            TextField(
+                value = longitud,
+                onValueChange = { longitud = it },
+                label = { Text("Longitud") }
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = {
-                if (nombre.isNotBlank() && año.isNotBlank() && descripcion.isNotBlank() && valoracion.isNotBlank()) {
+                if (nombre.isNotBlank() && año.isNotBlank() && descripcion.isNotBlank() && valoracion.isNotBlank() && latitud.isNotBlank() && longitud.isNotBlank()) {
                     val nuevaNovela = Novela(
                         nombre = nombre,
                         año = año.toInt(),
                         descripcion = descripcion,
                         valoracion = valoracion.toDouble(),
-                        isFavorite = false
+                        isFavorite = false,
+                        latitud = latitud.toDouble(),
+                        longitud = longitud.toDouble()
                     )
-                    dbHelper.addNovelaForUser(dbHelper.getUserIdByUsername(sharedPreferences.getString("current_user", "") ?: ""), nuevaNovela)
+                    dbHelper.saveNovela(nuevaNovela)
                     Toast.makeText(context, "Novela añadida", Toast.LENGTH_SHORT).show()
                     context.startActivity(Intent(context, MainActivity::class.java))
                 } else {
