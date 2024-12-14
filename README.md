@@ -9,7 +9,6 @@ Una aplicación móvil para gestionar una lista de novelas. Los usuarios pueden 
 - **Marcar como favoritas**: Los usuarios pueden marcar o desmarcar novelas como favoritas.
 - **Ver detalles de la novela**: Los usuarios pueden ver los detalles completos de cada novela.
 - **Filtrar novelas**: Los usuarios pueden ver todas las novelas o solo las favoritas.
-- **Gestión de usuarios**: Los usuarios pueden iniciar sesión y gestionar su propia lista de novelas.
 - **Mapa de novelas**: Muestra un mapa con las ubicaciones de las novelas.
 - **Ubicación actual**: Permite al usuario ver su ubicación actual en el mapa.
 
