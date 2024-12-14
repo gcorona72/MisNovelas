@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Permisos para acceder a la ubicación -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -24,12 +24,6 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <activity
-            android:name=".MapActivity"
-            android:exported="true">
-            <!-- Puedes agregar otras configuraciones si es necesario -->
         </activity>
 
     </application>
