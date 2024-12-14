@@ -5,14 +5,8 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -48,7 +42,8 @@ fun MainScreen(dbHelper: NovelaStorage, sharedPreferences: SharedPreferences) {
     ) {
         composable("main") { MainMenu(navController) }
         composable("novelList") { NovelListScreen(navController, dbHelper) }
-        composable("addNovel") { AddNovelaScreen(dbHelper) }
+        composable("addNovel") { AddNovelaScreen(dbHelper, navController) }
+        composable("map") { MapScreen(dbHelper) }
     }
 }
 
@@ -67,6 +62,10 @@ fun MainMenu(navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = { navController.navigate("addNovel") }) {
             Text("Añadir Novela")
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Button(onClick = { navController.navigate("map") }) { // Botón para navegar a MapScreen
+            Text("Ver Mapa de Novelas")
         }
     }
 }

@@ -75,7 +75,13 @@ dependencies {
         implementation ("com.google.android.gms:play-services-location:18.0.0")
     }
 
-
+    dependencies {
+        implementation("androidx.activity:activity-compose:1.7.2")
+        implementation("androidx.compose.ui:ui:1.5.1")
+        implementation("androidx.compose.ui:ui-viewbinding:1.5.1")
+        implementation("com.google.android.gms:play-services-maps:18.1.0")
+        implementation("com.google.android.gms:play-services-location:18.0.0")
+    }
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
